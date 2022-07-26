@@ -36,6 +36,7 @@ function deleteOne(req, res){
 
 function show(req, res){
   Project.findById(req.params.id)
+  .populate('days')
   .then(project => {project})
   .catch(err => {
     console.log(err)
@@ -59,7 +60,7 @@ function dayCreate(req, res){
   .then(project => {
     project.days.push(req.body)
     project.save()
-    .then(updatedProject => res.json(updatedProject))
+    .then(()=> res.json(project))
 
     })
   .catch(err => {
@@ -70,14 +71,21 @@ function dayCreate(req, res){
 
 
 function createSchedule(req, res){
-  Day.findById(req.params.dayId)
-  .then(day => {
-    Profile.findById(req.user.profile)
-    .then(profile => {
-      req.body.author = profile.name
-      day.schedules.push(req.body)
-      day.save()
-      .then(updatedDay => res.json(updatedDay))
+  Project.findById(req.params.id)
+  .populate('days')
+  .then(project => {
+    console.log(project)
+    Day.findById(req.params.id)
+    .populate('schedules')
+    .then(day => {
+      Profile.findById(req.user.profile)
+      .then(profile => {
+        req.body.author = profile.name
+        day.schedules.push(req.body)
+        day.save()
+        .then(updatedDay => res.json(updatedDay))
+    })
+
   })
 })
   .catch(err => {
