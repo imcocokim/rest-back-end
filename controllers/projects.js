@@ -53,26 +53,15 @@ function dayIndex(req, res) {
   })
 }
 
-// const dayCreate = async (req, res) => {
-//   try {
-//     const day = await Day.create(req.body)
-//     res.status(201).json(day)
-//   } catch (err) {
-//     res.status(500).json(err)
-//   }
-// }
-
 function dayCreate(req, res){
   Project.findById(req.params.id)
+  .populate('days')
   .then(project => {
-    Day.create(req.body)
-    .then(day => {
-      project.day.push(req.body)
-      project.save()
-      .then(updatedProject => res.json(updatedProject))
+    project.days.push(req.body)
+    project.save()
+    .then(updatedProject => res.json(updatedProject))
 
     })
-  })
   .catch(err => {
     console.log(err)
     res.status(500).json(err)
